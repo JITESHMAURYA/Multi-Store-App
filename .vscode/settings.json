@@ -1,0 +1,10 @@
+{   
+    "cmake.configureOnOpen": false,
+    "cmake.sourceDirectory": "",
+    "cmake.exclude": [
+        "**/linux/**",
+        "**/flutter/**"
+    ],
+    "window.zoomPerWindow": true,
+    // "cmake.sourceDirectory": "D:/Android Dev/Flutter Projects/Multi Store App/multi_store_app/linux"
+}

@@ -1,0 +1,106 @@
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:multi_store_app/models/cart.dart';
+
+//Define a stateNotifierProvider to expose an instance of the CartNotifier
+//making it accessible within our app
+final cartProvider = StateNotifierProvider<CartNotifier, Map<String, Cart>>((
+  ref,
+) {
+  return CartNotifier();
+});
+
+//notifier class to manage the cart state, extending stateNotifier
+//with an initial state of an empty map
+class CartNotifier extends StateNotifier<Map<String, Cart>> {
+  CartNotifier() : super({});
+
+  //method to add product to the cart
+  void addProductToCart({
+    required String productName,
+    required int productPrice,
+    required String category,
+    required List<String> image,
+    required String vendorId,
+    required int productQuantity,
+    required int quantity,
+    required String productId,
+    required String description,
+    required String fullName,
+  }) {
+    //check if the product is already in the cart
+    if (state.containsKey((productId))) {
+      //if the product is already in the cart, update it's quantity and maybe other detail
+      state = {
+        ...state,
+        productId: Cart(
+          productName: state[productId]!.productName,
+          productPrice: state[productId]!.productPrice,
+          category: state[productId]!.category,
+          image: state[productId]!.image,
+          vendorId: state[productId]!.vendorId,
+          productQuantity: state[productId]!.productQuantity,
+          quantity: state[productId]!.quantity + 1,
+          productId: state[productId]!.productId,
+          description: description,
+          fullName: state[productId]!.fullName,
+        ),
+      };
+    } else {
+      //if the product is not in the cart, add it with the provided details
+      state = {
+        ...state,
+        productId: Cart(
+          productName: productName,
+          productPrice: productPrice,
+          category: category,
+          image: image,
+          vendorId: vendorId,
+          productQuantity: productQuantity,
+          quantity: quantity,
+          productId: productId,
+          description: description,
+          fullName: fullName,
+        ),
+      };
+    }
+  }
+
+  //method to increment the quantity of a product in the cart
+  void incrementCartItem(String productId) {
+    if (state.containsKey(productId)) {
+      state[productId]!.quantity++;
+
+      //notify listeners that the state has changed
+      state = {...state};
+    }
+  }
+
+  //method to decrement the quantity of a product in the cart
+  void decrementCartItem(String productId) {
+    if (state.containsKey(productId)) {
+      state[productId]!.quantity--;
+
+      //notify the listeners that the state has changed
+      state = {...state};
+    }
+  }
+
+  //method to remove item from the cart
+  void removeCartItem(String productId) {
+    state.remove(productId);
+
+    //notify listeners that the state has changed
+    state = {...state};
+  }
+
+  //method to calculate total amount of items we have in cart
+  double calculateTotalAmount() {
+    double totalAmount = 0.0;
+    state.forEach((productId, cartItem) {
+      totalAmount += cartItem.quantity * cartItem.productPrice;
+    });
+    return totalAmount;
+  }
+
+  Map<String, Cart> get getCartItems => state;
+}
