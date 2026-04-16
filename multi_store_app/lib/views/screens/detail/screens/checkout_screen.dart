@@ -327,35 +327,69 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 ),
               ),
 
-              RadioListTile<String>(
-                title: Text(
-                  'Stripe',
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                value: 'stripe',
-                groupValue: selectedPaymentMethod,
-                onChanged: (String? value) {
-                  setState(() {
-                    selectedPaymentMethod = value!;
-                  });
-                },
-              ),
+              //DO NOT DELETE, IT IS DEPRECATED BUT CAN BE USED FOR REFERENCE
+              // RadioListTile<String>(
+              //   title: Text(
+              //     'Stripe',
+              //     style: GoogleFonts.montserrat(
+              //       fontWeight: FontWeight.bold,
+              //       fontSize: 18,
+              //     ),
+              //   ),
+              //   value: 'stripe',
+              //   groupValue: selectedPaymentMethod,
+              //   onChanged: (String? value) {
+              //     setState(() {
+              //       selectedPaymentMethod = value!;
+              //     });
+              //   },
+              // ),
 
-              RadioListTile<String>(
-                title: Text(
-                  'Cash on Delivery',
-                  style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
-                ),
-                value: 'CashOnDelivery',
+              // RadioListTile<String>(
+              //   title: Text(
+              //     'Cash on Delivery',
+              //     style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+              //   ),
+              //   value: 'CashOnDelivery',
+              //   groupValue: selectedPaymentMethod,
+              //   onChanged: (String? value) {
+              //     setState(() {
+              //       selectedPaymentMethod = value!;
+              //     });
+              //   },
+              // ),
+              RadioGroup<String>(
                 groupValue: selectedPaymentMethod,
-                onChanged: (String? value) {
-                  setState(() {
-                    selectedPaymentMethod = value!;
-                  });
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedPaymentMethod = value;
+                    });
+                  }
                 },
+                child: Column(
+                  children: [
+                    RadioListTile<String>(
+                      title: Text(
+                        'Stripe',
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      value: 'stripe',
+                    ),
+                    RadioListTile<String>(
+                      title: Text(
+                        'Cash on Delivery',
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      value: 'CashOnDelivery',
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

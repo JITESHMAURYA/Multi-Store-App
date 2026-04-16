@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_store_app/models/product.dart';
 import 'package:multi_store_app/provider/cart_provider.dart';
+import 'package:multi_store_app/provider/favorite_provider.dart';
 import 'package:multi_store_app/services/manage_http_response.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
@@ -17,6 +18,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final cartProviderData = ref.read(cartProvider.notifier);
+    final favoriteProviderData = ref.read(favoriteProvider.notifier);
+    ref.watch(favoriteProvider);
     final cartData = ref.watch(cartProvider);
     final isInCart = cartData.containsKey(widget.product.id);
     return Scaffold(
@@ -30,7 +33,32 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.favorite_border)),
+          IconButton(
+            onPressed: () {
+              favoriteProviderData.addProductToFavorite(
+                productName: widget.product.productName,
+                productPrice: widget.product.productPrice,
+                category: widget.product.category,
+                image: widget.product.images,
+                vendorId: widget.product.vendorId,
+                productQuantity: widget.product.quantity,
+                quantity: 1,
+                productId: widget.product.id,
+                description: widget.product.description,
+                fullName: widget.product.fullName,
+              );
+              showSnackBar(
+                context,
+                'added ${widget.product.productName} to favorites',
+              );
+            },
+            icon:
+                favoriteProviderData.getFavoriteItems.containsKey(
+                  widget.product.id,
+                )
+                ? Icon(Icons.favorite, color: Colors.red)
+                : Icon(Icons.favorite_border),
+          ),
         ],
       ),
       body: Column(
