@@ -272,7 +272,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: updatedOrder.delivered == true
+                        onPressed:
+                            updatedOrder.delivered == true ||
+                                updatedOrder.processing == false
                             ? null
                             : () async {
                                 await orderController
@@ -299,23 +301,29 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () async {
-                          await orderController
-                              .cancelOrder(
-                                id: widget.order.id,
-                                context: context,
-                              )
-                              .whenComplete(() {
-                                ref
-                                    .read(orderProvider.notifier)
-                                    .updateOrderStatus(
-                                      widget.order.id,
-                                      processing: false,
-                                    );
-                              });
-                        },
+                        onPressed:
+                            updatedOrder.processing == false ||
+                                updatedOrder.delivered == true
+                            ? null
+                            : () async {
+                                await orderController
+                                    .cancelOrder(
+                                      id: widget.order.id,
+                                      context: context,
+                                    )
+                                    .whenComplete(() {
+                                      ref
+                                          .read(orderProvider.notifier)
+                                          .updateOrderStatus(
+                                            widget.order.id,
+                                            processing: false,
+                                          );
+                                    });
+                              },
                         child: Text(
-                          'Cancel',
+                          updatedOrder.processing == false
+                              ? 'Canceled'
+                              : 'Cancel',
                           style: GoogleFonts.montserrat(
                             fontWeight: FontWeight.bold,
                             color: Colors.red,

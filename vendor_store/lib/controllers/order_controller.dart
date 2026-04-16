@@ -59,37 +59,46 @@ class OrderController {
     }
   }
 
-  Future<void> updateDeliveryStatus({required String id, required context}) async{
+  Future<void> updateDeliveryStatus({
+    required String id,
+    required context,
+  }) async {
     try {
-      http.Response response = await http.patch(Uri.parse('$uri/api/orders/$id/delivered'),
-      headers: <String, String>{
+      http.Response response = await http.patch(
+        Uri.parse('$uri/api/orders/$id/delivered'),
+        headers: <String, String>{
           "Content-Type": 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({
-          "delivered":true,
-        }),
+        body: jsonEncode({"delivered": true, "processing": false}),
       );
-      manageHttpResponse(response: response, context: context, onSuccess: (){
-        showSnackBar(context, "Order Updated");
-      });
+      manageHttpResponse(
+        response: response,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, "Order Updated");
+        },
+      );
     } catch (e) {
       showSnackBar(context, e.toString());
     }
   }
 
-  Future<void> cancelOrder({required String id, required context}) async{
+  Future<void> cancelOrder({required String id, required context}) async {
     try {
-      http.Response response = await http.patch(Uri.parse('$uri/api/orders/$id/processing'),
-      headers: <String, String>{
+      http.Response response = await http.patch(
+        Uri.parse('$uri/api/orders/$id/processing'),
+        headers: <String, String>{
           "Content-Type": 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({
-          "processing":false,
-        }),
+        body: jsonEncode({"processing": false, "delivered": false}),
       );
-      manageHttpResponse(response: response, context: context, onSuccess: (){
-        showSnackBar(context, "Order Canceled");
-      });
+      manageHttpResponse(
+        response: response,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, "Order Canceled");
+        },
+      );
     } catch (e) {
       showSnackBar(context, e.toString());
     }

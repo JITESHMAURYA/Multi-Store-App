@@ -1,18 +1,32 @@
+import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:multi_store_app/controllers/product_review_controller.dart';
 import 'package:multi_store_app/models/order.dart';
 
-class OrderDetailScreen extends StatelessWidget {
+class OrderDetailScreen extends StatefulWidget {
   final Order order;
 
   const OrderDetailScreen({super.key, required this.order});
+
+  @override
+  State<OrderDetailScreen> createState() => _OrderDetailScreenState();
+}
+
+class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  final TextEditingController _reviewController = TextEditingController();
+
+  double rating = 0.0;
+
+  final ProductReviewController _productReviewController =
+      ProductReviewController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          order.productName,
+          widget.order.productName,
           style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
         ),
       ),
@@ -61,7 +75,7 @@ class OrderDetailScreen extends StatelessWidget {
                                     left: 10,
                                     top: 5,
                                     child: Image.network(
-                                      order.image,
+                                      widget.order.image,
                                       width: 58,
                                       height: 67,
                                       fit: BoxFit.cover,
@@ -91,7 +105,7 @@ class OrderDetailScreen extends StatelessWidget {
                                           SizedBox(
                                             width: double.infinity,
                                             child: Text(
-                                              order.productName,
+                                              widget.order.productName,
                                               style: GoogleFonts.montserrat(
                                                 fontWeight: FontWeight.w700,
                                                 fontSize: 16,
@@ -102,7 +116,7 @@ class OrderDetailScreen extends StatelessWidget {
                                           Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              order.category,
+                                              widget.order.category,
                                               style: GoogleFonts.montserrat(
                                                 color: Color(0xFF7F808C),
                                                 fontWeight: FontWeight.w600,
@@ -112,7 +126,7 @@ class OrderDetailScreen extends StatelessWidget {
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            "\$${order.productPrice.toStringAsFixed(2)}",
+                                            "\$${widget.order.productPrice.toStringAsFixed(2)}",
                                             style: GoogleFonts.montserrat(
                                               color: Color(0xFF0B0C1E),
                                               fontSize: 15,
@@ -135,9 +149,9 @@ class OrderDetailScreen extends StatelessWidget {
                               height: 25,
                               clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
-                                color: order.delivered == true
+                                color: widget.order.delivered == true
                                     ? Color(0xFF3C55EF)
-                                    : order.processing == true
+                                    : widget.order.processing == true
                                     ? Colors.purple
                                     : Colors.red,
                                 borderRadius: BorderRadius.circular(4),
@@ -149,9 +163,9 @@ class OrderDetailScreen extends StatelessWidget {
                                     left: 9,
                                     top: 3,
                                     child: Text(
-                                      order.delivered == true
+                                      widget.order.delivered == true
                                           ? 'Delivered'
-                                          : order.processing == true
+                                          : widget.order.processing == true
                                           ? "Processing"
                                           : "Cancelled",
                                       style: GoogleFonts.montserrat(
@@ -206,7 +220,7 @@ class OrderDetailScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Container(
               width: 336,
-              height: order.delivered == true ? 170 : 120,
+              height: widget.order.delivered == true ? 170 : 120,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: Color(0xFFEFF0F2)),
@@ -230,75 +244,75 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          "${order.state} ${order.city} ${order.locality}",
+                          "${widget.order.state} ${widget.order.city} ${widget.order.locality}",
                           style: GoogleFonts.lato(
                             letterSpacing: 1.5,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         Text(
-                          "To : ${order.fullName}",
+                          "To : ${widget.order.fullName}",
                           style: GoogleFonts.roboto(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          "Order Id: ${order.id}",
+                          "Order Id: ${widget.order.id}",
                           style: GoogleFonts.lato(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ),
-                  order.delivered == true
+                  widget.order.delivered == true
                       ? TextButton(
                           onPressed: () {
-                            //                   showDialog(
-                            //                       context: context,
-                            //                       builder: (context) {
-                            //                         return AlertDialog(
-                            //                           title: const Text('Leave a review'),
-                            //                           content: Column(
-                            //                             mainAxisSize: MainAxisSize.min,
-                            //                             children: [
-                            //                               TextFormField(
-                            //                                 controller: _reviewController,
-                            //                                 decoration: const InputDecoration(
-                            //                                   labelText: 'Your Review',
-                            //                                 ),
-                            //                               ),
-                            //                               RatingBar(
-                            //                                 filledIcon: Icons.star,
-                            //                                 emptyIcon: Icons.star_border,
-                            //                                 onRatingChanged: (value) {
-                            //                                   rating = value;
-                            //                                 },
-                            //                                 initialRating: 2,
-                            //                                 maxRating: 5,
-                            //                               ),
-                            //                             ],
-                            //                           ),
-                            //                           actions: [
-                            //                             TextButton(
-                            //                               onPressed: () {
-                            //                                 final review = _reviewController.text;
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text('Leave a review'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextFormField(
+                                        controller: _reviewController,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Your Review',
+                                        ),
+                                      ),
+                                      RatingBar(
+                                        filledIcon: Icons.star,
+                                        emptyIcon: Icons.star_border,
+                                        onRatingChanged: (value) {
+                                          rating = value;
+                                        },
+                                        initialRating: 2,
+                                        maxRating: 5,
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        final review = _reviewController.text;
 
-                            //                                 _productReviewController.uploadReview(
-                            //                                     buyerId: widget.order.buyerId,
-                            //                                     email: widget.order.email,
-                            //                                     fullName: widget.order.fullName,
-                            //                                     productId: widget.order.id,
-                            //                                     rating: rating,
-                            //                                     review: review,
-                            //                                     context: context);
-                            //                               },
-                            //                               child: const Text(
-                            //                                 'Submit',
-                            //                               ),
-                            //                             ),
-                            //                           ],
-                            //                         );
-                            //                       });
+                                        _productReviewController.uploadReview(
+                                          buyerId: widget.order.buyerId,
+                                          email: widget.order.email,
+                                          fullName: widget.order.fullName,
+                                          productId: widget.order.id,
+                                          rating: rating,
+                                          review: review,
+                                          context: context,
+                                        );
+                                      },
+                                      child: const Text('Submit'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
                           child: Text(
                             'Leave a Review',
