@@ -121,6 +121,53 @@ productRouter.get("/api/top-rated-products", async (req, res) => {
     return res.status(500).json({ error: e.message });
   }
 });
+
+productRouter.get('/api/products-by-subcategory/:subCategory', async (req, res) => {
+  try {
+    const { subCategory } = req.params;
+    const products = await Product.find({ subCategory: subCategory, });
+    if (!products || products.length == 0) {
+      return res.status(404).json({ msg: "Product not found in this subcategory" });
+    }
+    return res.status(200).json(products);
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+//route for searching products by name or description
+productRouter.get('/api/search-products', async (req, res) => {
+  try {
+    //extract the query parameter from the request query string
+    const { query } = req.query;
+    //validate that a query parameter is provided
+    //if missing, return a 400 status with an error message
+    if (!query) {
+      return res.status(400).json({ msg: "Query parameter is required" });
+    }
+    //search for the product collection for documents where either 'ProductName' or 'description' 
+    //contains the specified query string
+    const products = await Product.find({
+      $or: [
+        //Regex will match any productName containing the query string,
+        //For example, if the user search for "apple", the regex will check
+        //if "apple" is part of any productName, so products name "green apple pie",
+        //or "fresh apples", would all match because they contain the word "apple"
+        { productName: { $regex: query, $options: 'i' } }, //'i' is for insensitive search, so it will match "Apple", "apple", "APPLE", etc.
+        { description: { $regex: query, $options: 'i' } }
+      ]
+    });
+    //check if any products were found, if no product match the query
+    //return a 404 status with an error message
+    if (!products || products.length == 0) {
+      return res.status(404).json({ msg: "No products found matching the query" });
+    }
+    //if product are found, return 200
+    return res.status(200).json(products);
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
 module.exports = productRouter;
 
 

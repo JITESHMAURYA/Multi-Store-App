@@ -11,14 +11,13 @@ class BannerWidget extends ConsumerStatefulWidget {
 }
 
 class _BannerWidgetState extends ConsumerState<BannerWidget> {
-
-
   @override
   void initState() {
     super.initState();
     _fetchBanners();
   }
-  Future<void>_fetchBanners()async{
+
+  Future<void> _fetchBanners() async {
     final BannerController bannerController = BannerController();
     try {
       final banners = await bannerController.loadBanners();
@@ -39,15 +38,18 @@ class _BannerWidgetState extends ConsumerState<BannerWidget> {
         borderRadius: BorderRadius.circular(4),
       ),
       child: PageView.builder(
-              itemCount: banners.length,
-              itemBuilder: (context, index) {
-                final banner = banners[index];
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.network(banner.image, fit: BoxFit.cover),
-                );
-              },
-            )
+        itemCount: banners.length,
+        itemBuilder: (context, index) {
+          final banner = banners[index];
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(banner.image, fit: BoxFit.cover),
+            ),
+          );
+        },
+      ),
     );
   }
 }

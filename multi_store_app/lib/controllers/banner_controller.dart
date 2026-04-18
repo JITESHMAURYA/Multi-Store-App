@@ -1,13 +1,10 @@
 import 'dart:convert';
 
-
 import 'package:http/http.dart' as http;
 import 'package:multi_store_app/global_variables.dart';
 import 'package:multi_store_app/models/banner_model.dart';
 
 class BannerController {
-  
-
   Future<List<BannerModel>> loadBanners() async {
     try {
       http.Response response = await http.get(
@@ -23,7 +20,9 @@ class BannerController {
             .map((banner) => BannerModel.fromJson(banner))
             .toList();
         return banners;
-      }else{
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
         throw Exception('Failed to load Banner');
       }
     } catch (e) {

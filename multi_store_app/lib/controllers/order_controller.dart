@@ -90,6 +90,8 @@ class OrderController {
             .map((order) => Order.fromJson(order))
             .toList();
         return orders;
+      } else if (response.statusCode == 404) {
+        return [];
       }
       {
         //throw an exception if the server responded with an error status code
@@ -127,12 +129,12 @@ class OrderController {
   }
 
   //Method to cound deliverd orders
-  Future<int> getDeliveredOrderCount({required String buyerId})async{
+  Future<int> getDeliveredOrderCount({required String buyerId}) async {
     try {
       //load all orders
-      List<Order> orders = await loadOrders(buyerId:   buyerId);
+      List<Order> orders = await loadOrders(buyerId: buyerId);
       //filter only deliverd orders
-      int deliveredCount = orders.where((order)=>order.delivered).length;
+      int deliveredCount = orders.where((order) => order.delivered).length;
       return deliveredCount;
     } catch (e) {
       throw Exception('Error counting delivered orders');
