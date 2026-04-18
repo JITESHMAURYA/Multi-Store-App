@@ -10,7 +10,7 @@ const productReviewRouter = require("./routes/product_review");
 const vendorRouter = require("./routes/vendor");
 const orderRouter = require("./routes/order");
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 const DB =
