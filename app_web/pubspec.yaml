@@ -38,6 +38,7 @@ dependencies:
   file_picker: ^10.3.8
   http: ^1.6.0
   cloudinary_public: ^0.23.1
+  google_fonts: ^8.0.2
 
  
 

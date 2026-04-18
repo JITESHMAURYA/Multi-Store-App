@@ -1,10 +1,10 @@
-import 'package:app_web/views/side_bar_screens.dart/buyers_screen.dart';
-import 'package:app_web/views/side_bar_screens.dart/category_screen.dart';
-import 'package:app_web/views/side_bar_screens.dart/orders_screen.dart';
-import 'package:app_web/views/side_bar_screens.dart/products_screen.dart';
-import 'package:app_web/views/side_bar_screens.dart/subcategory_screen.dart';
-import 'package:app_web/views/side_bar_screens.dart/upload_banner_screen.dart';
-import 'package:app_web/views/side_bar_screens.dart/vendors_screen.dart';
+import 'package:app_web/views/side_bar_screens/buyers_screen.dart';
+import 'package:app_web/views/side_bar_screens/category_screen.dart';
+import 'package:app_web/views/side_bar_screens/orders_screen.dart';
+import 'package:app_web/views/side_bar_screens/products_screen.dart';
+import 'package:app_web/views/side_bar_screens/subcategory_screen.dart';
+import 'package:app_web/views/side_bar_screens/upload_banner_screen.dart';
+import 'package:app_web/views/side_bar_screens/vendors_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';

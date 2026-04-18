@@ -1,5 +1,5 @@
 import 'package:app_web/controllers/banner_controller.dart';
-import 'package:app_web/views/side_bar_screens.dart/widgets/banner_widget.dart';
+import 'package:app_web/views/side_bar_screens/widgets/banner_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 

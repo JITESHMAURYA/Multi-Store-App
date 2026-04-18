@@ -1,22 +1,33 @@
 import 'package:app_web/controllers/category_controller.dart';
-import 'package:app_web/views/side_bar_screens.dart/widgets/category_widget.dart';
+import 'package:app_web/controllers/subcategory_controller.dart';
+import 'package:app_web/models/category.dart';
+import 'package:app_web/views/side_bar_screens/widgets/subcategory_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-class CategoryScreen extends StatefulWidget {
-  static const String id = '\category-screen';
-  const CategoryScreen({super.key});
+class SubcategoryScreen extends StatefulWidget {
+  static const String id = 'subCategoryScreen';
+  const SubcategoryScreen({super.key});
 
   @override
-  State<CategoryScreen> createState() => _CategoryScreenState();
+  State<SubcategoryScreen> createState() => _SubcategoryScreenState();
 }
 
-class _CategoryScreenState extends State<CategoryScreen> {
+class _SubcategoryScreenState extends State<SubcategoryScreen> {
+  final SubcategoryController subcategoryController = SubcategoryController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final CategoryController _categoryController = CategoryController();
+  late Future<List<Category>> futureCategories;
   late String name;
+  Category? selectedCategory;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    futureCategories = CategoryController().loadCategories();
+  }
+
   dynamic _image;
-  dynamic _bannerImage;
 
   pickImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -26,18 +37,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
     if (result != null) {
       setState(() {
         _image = result.files.first.bytes;
-      });
-    }
-  }
-
-  pickBannerImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
-    );
-    if (result != null) {
-      setState(() {
-        _bannerImage = result.files.first.bytes;
       });
     }
   }
@@ -55,7 +54,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               child: Container(
                 alignment: Alignment.topLeft,
                 child: const Text(
-                  'Categories',
+                  'Subcategories',
                   style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -63,6 +62,38 @@ class _CategoryScreenState extends State<CategoryScreen> {
             const Padding(
               padding: EdgeInsets.all(4.0),
               child: Divider(color: Colors.grey),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FutureBuilder(
+                future: futureCategories,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No Category'));
+                  } else {
+                    return DropdownButton<Category>(
+                      value: selectedCategory,
+                      hint: Text('Select Category'),
+                      items: snapshot.data!.map((Category category) {
+                        return DropdownMenuItem(
+                          value: category,
+                          child: Text(category.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory = value;
+                        });
+                        print(selectedCategory!.name);
+                      },
+                    );
+                  }
+                },
+              ),
             ),
             Row(
               children: [
@@ -78,7 +109,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     child: Center(
                       child: _image != null
                           ? Image.memory(_image)
-                          : const Text('Category Image'),
+                          : const Text('Subcategory Image'),
                     ),
                   ),
                 ),
@@ -94,33 +125,31 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         if (value!.isNotEmpty) {
                           return null;
                         } else {
-                          return 'please enter category name';
+                          return 'please enter subcategory name';
                         }
                       },
                       decoration: const InputDecoration(
-                        labelText: 'Enter Category Name',
+                        labelText: 'Enter Subcategory Name',
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                OutlinedButton(onPressed: () {}, child: const Text('Cancel')),
+
                 const SizedBox(width: 10),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      await _categoryController.uploadCategory(
-                        name: name,
+                      await subcategoryController.uploadSubcategory(
+                        categoryId: selectedCategory!.id,
+                        categoryName: selectedCategory!.name,
                         pickedImage: _image,
-                        pickedBanner: _bannerImage,
+                        subCategoryName: name,
                         context: context,
                       );
                       setState(() {
                         _formKey.currentState!.reset();
                         _image = null;
-                        _bannerImage = null;
-                        name = "";
                       });
                     }
                   },
@@ -145,42 +174,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 child: const Text('Pick Image'),
               ),
             ),
-            const Divider(color: Colors.grey),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 150,
-                width: 150,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: _bannerImage != null
-                      ? Image.memory(_bannerImage)
-                      : const Text(
-                          'Category Banner',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                ),
-              ),
+            const Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Divider(color: Colors.grey),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 8.0,
-                left: 22,
-                bottom: 8,
-                right: 18,
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  pickBannerImage();
-                },
-                child: const Text('Pick Image'),
-              ),
-            ),
-            const Divider(color: Colors.grey),
-            const CategoryWidget(),
+            SubcategoryWidget(),
           ],
         ),
       ),

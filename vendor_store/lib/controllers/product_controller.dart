@@ -1,6 +1,7 @@
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
 // import 'package:cloudinary_public/cloudinary_public.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:vendor_store/global_variables.dart';
 // import 'package:vendor_store/models/product.dart';
 // import 'package:vendor_store/services/manage_http_response.dart';
@@ -18,6 +19,8 @@
 //     required List<File>? pickImages,
 //     required context,
 //   }) async {
+//     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+//     String? token = sharedPreferences.getString('auth_token');
 //     if (pickImages != null) {
 //       final cloudinary = CloudinaryPublic('dwobjlgow', 'ha9xksq3');
 //       List<String> images = [];
@@ -48,6 +51,7 @@
 //           body: product.toJson(),
 //           headers: <String, String>{
 //             "Content-Type": 'application/json; charset=UTF-8',
+//             'x-auth-token': token!,
 //           },
 //         );
 //         manageHttpResponse(

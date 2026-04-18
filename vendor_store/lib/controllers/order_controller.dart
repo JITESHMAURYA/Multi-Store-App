@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vendor_store/global_variables.dart';
 import 'package:vendor_store/models/order.dart';
 import 'package:vendor_store/services/manage_http_response.dart';
@@ -8,11 +9,15 @@ class OrderController {
   // Method to GET orders by vendor id
   Future<List<Order>> loadOrders({required String vendorId}) async {
     try {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      String? token = sharedPreferences.getString('auth_token');
       //send an http get requrest to get the orders by the vendorId
       http.Response response = await http.get(
         Uri.parse('$uri/api/orders/vendors/$vendorId'),
         headers: <String, String>{
           "Content-Type": 'application/json; charset=UTF-8',
+          'x-auth-token': token!,
         },
       );
       //check if the response status code is 200(OK)
