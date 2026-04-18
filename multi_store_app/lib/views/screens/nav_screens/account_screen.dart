@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_store_app/provider/cart_provider.dart';
+import 'package:multi_store_app/provider/delivered_order_count_provider.dart';
 import 'package:multi_store_app/provider/favorite_provider.dart';
 import 'package:multi_store_app/provider/user_provider.dart';
 import 'package:multi_store_app/views/screens/detail/screens/order_screen.dart';
@@ -17,6 +18,13 @@ class AccountScreen extends ConsumerStatefulWidget {
 class _AccountScreenState extends ConsumerState<AccountScreen> {
   @override
   Widget build(BuildContext context) {
+    final buyerId = ref.read(userProvider)!.id;
+    //fetch the deliverd order count when the widget is built
+    ref
+        .read(deliveredOrderCountProvider.notifier)
+        .fetchDeliveredOrderCount(buyerId, context);
+    // watch the deliverdOrderCount to reactively rebuild when the state changes
+    final deliveredCount = ref.watch(deliveredOrderCountProvider);
     final user = ref.read(userProvider);
     final cartData = ref.read(cartProvider);
     final favoriteCount = ref.read(favoriteProvider);
@@ -138,7 +146,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                             left: 240,
                             top: 66,
                             child: Text(
-                              "15",
+                              deliveredCount.toString(),
                               style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontSize: 22,
