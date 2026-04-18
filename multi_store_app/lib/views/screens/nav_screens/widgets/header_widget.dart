@@ -7,13 +7,15 @@ class HeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.20,
+      height: MediaQuery.of(context).size.height * 0.155,
       child: Stack(
         children: [
-          Image.asset(
-            'assets/icons/searchBanner.jpeg',
-            width: MediaQuery.of(context).size.width,
-            fit: BoxFit.cover,
+          Positioned.fill(
+            child: Image.asset(
+              'assets/icons/searchBanner.jpeg',
+              width: MediaQuery.of(context).size.width,
+              fit: BoxFit.cover,
+            ),
           ),
           Positioned(
             left: 10,
@@ -26,20 +28,14 @@ class HeaderWidget extends StatelessWidget {
                   hintText: 'Enter text',
                   hintStyle: const TextStyle(
                     fontSize: 14,
-                    color: Color(
-                      0xFF7F7F7F,
-                    ),
+                    color: Color(0xFF7F7F7F),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 12.5,
                   ),
-                  prefixIcon: Image.asset(
-                    'assets/icons/searc1.png',
-                  ),
-                  suffixIcon: Image.asset(
-                    'assets/icons/cam.png',
-                  ),
+                  prefixIcon: Image.asset('assets/icons/searc1.png'),
+                  suffixIcon: Image.asset('assets/icons/cam.png'),
                   fillColor: Colors.grey.shade200,
                   filled: true,
                   focusColor: Colors.black,
@@ -84,7 +80,7 @@ class HeaderWidget extends StatelessWidget {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

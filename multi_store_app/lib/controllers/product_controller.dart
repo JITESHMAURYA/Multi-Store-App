@@ -87,4 +87,34 @@ class ProductController {
       throw Exception('Error loading related products : $e');
     }
   }
+
+  //method to get top 10 highest rated products
+  Future<List<Product>> loadTopRatedProduct() async {
+    try {
+      http.Response response = await http.get(
+        Uri.parse('$uri/api/top-rated-products'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; chartset=UTF-8 ',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        //Decode the json response body into a list  of dynamic object
+        final List<dynamic> data = json.decode(response.body) as List<dynamic>;
+        //map each items in the list to product model object which we can use
+
+        List<Product> topRatedProducts = data
+            .map((product) => Product.fromMap(product as Map<String, dynamic>))
+            .toList();
+        return topRatedProducts;
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        //if status code is not 200 , throw an execption   indicating failure to load the popular products
+        throw Exception('Failed to load Top Rated products');
+      }
+    } catch (e) {
+      throw Exception('Error related product : $e');
+    }
+  }
 }
