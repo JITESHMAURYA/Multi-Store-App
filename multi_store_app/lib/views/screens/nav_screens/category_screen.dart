@@ -6,6 +6,7 @@ import 'package:multi_store_app/controllers/subcategory_controller.dart';
 import 'package:multi_store_app/models/category.dart';
 import 'package:multi_store_app/provider/category_provider.dart';
 import 'package:multi_store_app/provider/subcategory_provider.dart';
+import 'package:multi_store_app/views/screens/detail/screens/subcategory_product.dart';
 import 'package:multi_store_app/views/screens/detail/screens/widgets/subcategory_tile_widget.dart';
 import 'package:multi_store_app/views/screens/nav_screens/widgets/header_widget.dart';
 
@@ -137,9 +138,24 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                                     ),
                                 itemBuilder: (context, index) {
                                   final subcategory = subcategories[index];
-                                  return SubcategoryTileWidget(
-                                    image: subcategory.image,
-                                    title: subcategory.subCategoryName,
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Handle subcategory tap
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) {
+                                            return SubcategoryProductScreen(
+                                              subcategory: subcategory,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    child: SubcategoryTileWidget(
+                                      image: subcategory.image,
+                                      title: subcategory.subCategoryName,
+                                    ),
                                   );
                                 },
                               )
