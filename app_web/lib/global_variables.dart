@@ -1,1 +1,1 @@
-String uri = 'http://localhost:3000';
+String uri = 'https://backend-multi-store-app.onrender.com';

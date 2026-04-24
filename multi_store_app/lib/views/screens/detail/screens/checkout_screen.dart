@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_store_app/controllers/order_controller.dart';
 import 'package:multi_store_app/provider/cart_provider.dart';
@@ -18,6 +19,94 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   String selectedPaymentMethod = 'stripe';
   final OrderController _orderController = OrderController();
+  bool isLoading = false;
+
+  Future<void> handleStripePayment() async {
+    // fetch the cart data from riverpod provider
+    final cartData = ref.read(cartProvider);
+    //fetch the user data from riverpod provider
+    final user = ref.read(userProvider);
+    //check if cart is empty
+    if (cartData.isEmpty) {
+      showSnackBar(context, 'Your cart is empty');
+      return;
+    }
+
+    //if user is null
+    if (user == null) {
+      showSnackBar(context, 'User Information is missing');
+      return;
+    }
+
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      //calculate the total amount for all item in cart
+      final totalAmount = cartData.values.fold(
+        0.0,
+        (sum, item) => sum + (item.quantity * item.productPrice),
+      );
+      //check if the total amount is a valid amount
+      if (totalAmount <= 0) {
+        showSnackBar(context, "Total amount must be greater than zero");
+        return;
+      }
+      //create a payment intent with the calculated total amount and currency
+      final paymentIntent = await _orderController.createPaymentIntent(
+        amount: (totalAmount * 100).toInt(),
+        currency: 'usd',
+      );
+      //initialize the stripe payment sheet with the payment intent deatils
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: paymentIntent['client_secret'],
+          merchantDisplayName: 'Multi Store App',
+        ),
+      );
+      //present the payment sheet to the user
+      await Stripe.instance.presentPaymentSheet();
+      // step 4 : verify payment status
+      final paymentIntentStatus = await _orderController.getPaymentIntentStatus(
+        context: context,
+        paymentIntentId: paymentIntent['id'],
+      );
+      //upload each cart item as an order to the server
+      if (paymentIntentStatus == 'succeeded') {
+        for (final entry in cartData.entries) {
+          var item = entry.value;
+          await _orderController.uploadOrder(
+            id: '',
+            fullName: user.fullName,
+            email: user.email,
+            state: user.state,
+            city: user.city,
+            locality: user.locality,
+            productName: item.productName,
+            productPrice: item.productPrice,
+            quantity: item.quantity,
+            category: item.category,
+            image: item.image[0],
+            buyerId: user.id,
+            vendorId: item.vendorId,
+            processing: true,
+            delivered: false,
+            context: context,
+            paymentStatus: paymentIntentStatus['status'],
+            paymentIntentId: paymentIntentStatus['id'],
+            paymentMethod: 'card',
+          );
+        }
+      }
+    } catch (e) {
+      showSnackBar(context, "Payment Failed : $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartData = ref.read(cartProvider);
@@ -445,6 +534,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         processing: true,
                         delivered: false,
                         context: context,
+                        paymentStatus: "pending",
+                        paymentIntentId: "cod",
+                        paymentMethod: "cod",
                       );
                     }).then((value) {
                       _cartProvider.clearCart();
@@ -468,16 +560,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Center(
-                    child: Text(
-                      selectedPaymentMethod == 'stripe'
-                          ? 'Pay Now'
-                          : 'PlaceOrder',
-                      style: GoogleFonts.montserrat(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
+                    child: isLoading
+                        ? CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                            selectedPaymentMethod == 'stripe'
+                                ? 'Pay Now'
+                                : 'PlaceOrder',
+                            style: GoogleFonts.montserrat(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
                   ),
                 ),
               ),
